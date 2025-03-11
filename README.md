@@ -15,7 +15,7 @@ Convert all of your Facebook messages into a personalized GPT chatbot.
 
 ## 📥 Step 1: Request Your Facebook Messenger Data
 
-You need to download all of your Facebook message history. This process can take up to 15 hours, depending on your account age.
+To use the in-built vectorizing code in this repo, you'll need to download your Facebook message history. This process can take up to 15 hours, depending on your account age.
 
 1. Go to **[Facebook Account Center](https://accountscenter.facebook.com/info_and_permissions)**
 2. Request a download of your **Messages Data**
