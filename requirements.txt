@@ -1,0 +1,4 @@
+discord.py==2.5.2
+faiss_cpu==1.10.0 # Important - if you have a GPU, use faiss-gpu
+numpy==2.2.3
+openai==1.66.0
