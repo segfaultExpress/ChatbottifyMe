@@ -1,4 +1,7 @@
-discord.py==2.5.2
+discord.py==2.4.0 # regression due to extension
+elevenlabs==1.54.0
 faiss_cpu==1.10.0 # Important - if you have a GPU, use faiss-gpu
 numpy==2.2.3
-openai==1.66.0
+openai==1.66.3
+pydub==0.25.1
+SpeechRecognition==3.14.1
