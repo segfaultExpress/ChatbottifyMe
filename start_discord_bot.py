@@ -1,9 +1,13 @@
 import discord
 import json
 from discord.ext import commands
-from chatbot import Chatbot
+from audio_chatbot import AudioChatbot # Chatbot but more intense
 import logging
+from config import OPUS_LIB_PATH
 import os
+import speech_recognition as sr
+from transcription_sink import TranscriptionSink
+from discord.ext import voice_recv
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
@@ -18,6 +22,9 @@ CONFIG_FILE = "discord_channel_config.json"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Keep track of voice clients
+voice_clients = {}
 
 # Load channel data
 def load_data():
@@ -46,8 +53,10 @@ guild_channel_map = load_data()
 # Create bot with command prefix and required intents
 intents = discord.Intents.default()
 intents.message_content = True  # REQUIRED to read user messages
+intents.voice_states = True  # REQUIRED to join voice channels
+
 bot = commands.Bot(command_prefix="!", intents=intents)
-discord_chatbot = Chatbot()
+discord_chatbot = AudioChatbot()
 
 @bot.event
 async def on_ready():
@@ -56,6 +65,14 @@ async def on_ready():
     for guild in bot.guilds:
         if str(guild.id) not in guild_channel_map:
             await find_default_channel(guild, first_time=True)
+
+    discord.opus.load_opus(OPUS_LIB_PATH)
+
+    if discord.opus.is_loaded():
+        print("Opus is successfully loaded!")
+    else:
+        print("Opus is NOT loaded! Check installation.")
+
     print("Bot is ready!")
 
 @bot.event
@@ -82,6 +99,39 @@ async def find_default_channel(guild, first_time=False):
             break
 
 @bot.command()
+async def join(ctx):
+    """Command to join the user's voice channel."""
+    if ctx.author.voice:
+        channel = ctx.author.voice.channel
+        vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
+
+        discord_chatbot.set_vc(vc)
+
+        sink = TranscriptionSink(bot, on_silent_callback=on_voice_silence)
+        vc.listen(sink)
+        await ctx.send("Joined and Listening...")
+    else:
+        await ctx.send("You must be in a voice channel for me to join.")
+
+async def on_voice_silence(text):
+    discord_chatbot.respond_with_context(text)
+
+@bot.command()
+async def leave(ctx):
+    """Command to leave the voice channel."""
+    if ctx.guild.id in voice_clients:
+        await ctx.voice_client.disconnect()
+        await ctx.send("Disconnected.")
+        # Stop listening for audio
+        # discord_chatbot.stop_listening()
+
+        await ctx.send("Disconnected from the voice channel.")
+    else:
+        await ctx.send("I'm not in a voice channel.")
+
+
+
+@bot.command()
 async def set_channel(ctx):
     """Allows users to set the bot's default channel for messages."""
     guild_id_str = str(ctx.guild.id)
@@ -103,6 +153,7 @@ async def send_message(ctx, *, message: str = "Hello, Discord!"):
     else:
         await ctx.send("Error: Channel not found.")
 
+'''
 @bot.event
 async def on_message(message):
     """Listens to messages in the assigned channel and responds only in the set channel."""
@@ -130,6 +181,7 @@ async def on_message(message):
             await message.channel.send(response)
         except Exception as e:
             await message.channel.send(f"Error generating response: {e}")
+'''
 
 # Run the bot
 bot.run(DISC_BOT_TOKEN)
