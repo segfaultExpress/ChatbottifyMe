@@ -71,7 +71,6 @@ class AudioChatbot(Chatbot):
             self.vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source=temp_wav.name), after=callback)
             print("Playing audio...")
         except Exception as e:
-            print("FUCK YOU FUCK YOU FUCK YOU FUCK YOU FUCK YOU FUCK YOU FUCK YOU")
             print(f"Error converting audio: {e}")
 
     def converse_vocally(self):
