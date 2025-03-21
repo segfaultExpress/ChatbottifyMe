@@ -153,7 +153,6 @@ async def send_message(ctx, *, message: str = "Hello, Discord!"):
     else:
         await ctx.send("Error: Channel not found.")
 
-'''
 @bot.event
 async def on_message(message):
     """Listens to messages in the assigned channel and responds only in the set channel."""
@@ -181,7 +180,7 @@ async def on_message(message):
             await message.channel.send(response)
         except Exception as e:
             await message.channel.send(f"Error generating response: {e}")
-'''
+
 
 # Run the bot
 bot.run(DISC_BOT_TOKEN)
