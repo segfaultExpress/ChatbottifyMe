@@ -1,4 +1,5 @@
 discord.py==2.4.0 # regression due to extension
+discord-ext-voice-recv
 elevenlabs==1.54.0
 faiss_cpu==1.10.0 # Important - if you have a GPU, use faiss-gpu
 numpy==2.2.3
